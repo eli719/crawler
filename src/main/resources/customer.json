@@ -1,0 +1,32 @@
+{
+  "customers": [
+    {
+      "orgcode": "1",
+      "orgname": "aaa",
+      "params": {
+        "username": "ccc",
+        "password": "ddd"
+      },
+      "website": "www.baidu.com",
+      "dailyTime": "0/30 * 9 * * ?",
+      "merge": false,
+      "status": true,
+      "type": "Y",
+      "action": "cn.eli486.imp.Demo"
+    },
+    {
+      "orgcode": "21",
+      "orgname": "bbb",
+      "params": {
+        "username": "qqq",
+        "password": "eeee"
+      },
+      "website": "www.baidu.com",
+      "dailyTime": "0/20 * 9 * * ?",
+      "merge": false,
+      "status": true,
+      "type": "Y",
+      "action": "cn.eli486.imp.Demo2"
+    }
+  ]
+}
