@@ -1,4 +1,4 @@
-package cn.eli486.util;
+package cn.eli486.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -15,14 +15,15 @@ import java.util.List;
  * @author eli
  */
 public  class FileUtil {
-	
-	public static void createExcel(List<List<String>> list, String fileName, Title<String> title) throws IOException {
+
+
+	public static void createExcel(List<List<String>> list, String fileName, List<String> title) throws IOException {
 
 		HSSFWorkbook excel = new HSSFWorkbook();
 		HSSFSheet sheet = excel.createSheet("page1");
 		if(title!=null) {
 			// 创建表头
-			String[] t = (String[]) title.show();
+			String[] t= (String[]) title.toArray (new String[title.size()]);
 			HSSFRow titleRow = sheet.createRow(0);
 			for (int i = 0; i < t.length; i++) {
 				titleRow.createCell(i).setCellValue(t[i]);
@@ -65,7 +66,7 @@ public  class FileUtil {
 	 */
 	public static boolean checkFile(String fileName) {
 		File file = new File(fileName);
-		return file.exists() ? true : false;
+		return file.exists ();
 	}
 	
 	/**

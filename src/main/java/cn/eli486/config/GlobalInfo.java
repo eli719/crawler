@@ -1,6 +1,6 @@
 package cn.eli486.config;
 
-import cn.eli486.util.DateUtil;
+import cn.eli486.utils.DateUtil;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class GlobalInfo {
-	public static  String rootPath;
+	public static  String fileNamePrefix="";
 	/**
 	 * 验证码图片存储地址
 	 */

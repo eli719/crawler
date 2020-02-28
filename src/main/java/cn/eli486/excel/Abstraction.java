@@ -1,33 +1,33 @@
 package cn.eli486.excel;
 
+import cn.eli486.config.TitleConfig;
 import cn.eli486.service.Purchase;
 import cn.eli486.service.Sale;
 import cn.eli486.service.Stock;
-import cn.eli486.util.DateUtil;
-import cn.eli486.util.FileUtil;
-import cn.eli486.util.Title;
+import cn.eli486.utils.DateUtil;
+import cn.eli486.utils.FileUtil;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.eli486.util.FileUtil.getSumInfo;
-import static cn.eli486.util.FileUtil.hasCreateDir;
+import static cn.eli486.utils.FileUtil.getSumInfo;
+import static cn.eli486.utils.FileUtil.hasCreateDir;
 
 /**
  * @author eli
  * 任务模板类
  */
-public abstract class ExcelDemo implements Stock, Sale, Purchase {
+public abstract class Abstraction implements Stock, Sale, Purchase {
     protected boolean merge = false;
-    protected Logger logger = LoggerFactory.getLogger (ExcelDemo.class);
+    protected Logger logger = LoggerFactory.getLogger (Abstraction.class);
     private String dir = "D:/XJPFile/auto17/" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd");
-    private Title<String> title = null;
-    protected List<List<String>> content = new ArrayList<> ();
+    private String bakDir = "D:/XJPFile/bak/" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd");
+    private List<String> title = null;
+
     public boolean isMerge () {
         return merge;
     }
@@ -37,75 +37,22 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
     }
 
 
-
     /**
      * 模拟登录
+     *
      * @param client 客户端
      * @param params 登录参数
      * @throws Exception 登录异常
      */
-    protected abstract void login(CloseableHttpClient client, Map<String, String> params) throws Exception;
-
-    /**
-     * 标准Stock表头
-     * @return 链表表头
-     */
-    public static Title<String> defaultStock () {
-        Title<String> stock = new Title<> ();
-        stock.append ("库存日期");
-        stock.append ("产品名称");
-        stock.append ("产品规格");
-        stock.append ("数量");
-        stock.append ("批号");
-        stock.append ("单位");
-        stock.append ("有效日期");
-        return stock;
-    }
-    /**
-     * 标准Sale表头
-     * @return 链表表头
-     */
-    public static Title<String> defaultSale () {
-        Title<String> sale = new Title<> ();
-        sale.append ("销售日期");
-        sale.append ("客户名称");
-        sale.append ("客户编码");
-        sale.append ("产品名称");
-        sale.append ("产品规格");
-        sale.append ("数量");
-        sale.append ("产品价格");
-        sale.append ("收货地址");
-        sale.append ("收获邮编");
-        sale.append ("客户电话");
-        sale.append ("客户联系人");
-        sale.append ("批号");
-        sale.append ("单位");
-        sale.append ("有效日期");
-        return sale;
-    }
-    /**
-     * 标准Purchase表头
-     * @return 链表表头
-     */
-    public static Title<String> defaultPurchase () {
-        Title<String> purchase = new Title<> ();
-        purchase.append ("入库时间");
-        purchase.append ("供应商名称");
-        purchase.append ("产品名称");
-        purchase.append ("产品规格");
-        purchase.append ("数量");
-        purchase.append ("批号");
-        purchase.append ("单位");
-        purchase.append ("有效日期");
-        return purchase;
-    }
+    protected abstract void login (CloseableHttpClient client, Map<String, String> params) throws Exception;
 
     /**
      * 执行任务
-     * @param client 客户端
+     *
+     * @param client      客户端
      * @param loginParams 登录参数
-     * @param orgCode 商业code
-     * @param orgName 商业name
+     * @param orgCode     商业code
+     * @param orgName     商业name
      * @throws Exception 异常
      */
     public void exec (CloseableHttpClient client, Map<String, String> loginParams, String orgCode, String orgName) throws Exception {
@@ -117,33 +64,36 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
             throw new Exception (e.getMessage ());
         }
 
-        stock (client,orgCode,orgName);
-        sale (client,orgCode,orgName);
-        purchase (client,orgCode,orgName);
+        stock (client, orgCode, orgName);
+        sale (client, orgCode, orgName);
+        purchase (client, orgCode, orgName);
 
-        logger.info(orgName + "  " + DateUtil.getBeforeDayAgainstToday (1,"yyyy-MM-dd") + "  日报完成");
-        logger.info("------------------------------------------------------------------------------------------------------");
+        logger.info (orgName + "  " + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "  日报完成");
+        logger.info ("------------------------------------------------------------------------------------------------------");
     }
 
     /**
      * 库存
-     * @param client 客户端
+     *
+     * @param client  客户端
      * @param orgCode 商业code
      * @param orgName 商业name
      */
-    protected void stock (CloseableHttpClient client, String orgCode, String orgName){
+
+
+    protected void stock (CloseableHttpClient client, String orgCode, String orgName) {
         try {
-            String stockFile = "D:\\XJPFile\\auto17\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/V"
-                    + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
-            String bakFileV = "D:\\XJPFile\\bak\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/V" + orgCode
-                    + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
+            String stockFile = dir + "\\V"
+                    + orgCode.split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
+            String bakFile = bakDir + "\\V" + orgCode.split ("-")[0]
+                    + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
             title = createStock ();
             if (title == null) {
-                title=defaultStock ();
+                title = TitleConfig.getTitle ().get (0);
             }
             if (!merge) {
 
-                if ((FileUtil.checkFile (stockFile)) || (FileUtil.checkFile (bakFileV))) {
+                if ((FileUtil.checkFile (stockFile)) || (FileUtil.checkFile (bakFile))) {
                     logger.info ("库存已生成 ");
                 } else {
                     List<List<String>> stockInfo = getStock (client, orgName, title);
@@ -160,7 +110,7 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
 
             } else {
                 // 创建子文件
-                String childDir = dir + "/" + orgCode.concat ("_").concat (orgName.split ("-")[0]);
+                String childDir = dir + "/" + orgCode.split ("-")[0].concat (orgName);
                 // 创建子文件名称
                 String stockChildFile = childDir + "/V" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + orgName + ".xls";
                 File dirFile = new File (childDir);
@@ -176,7 +126,7 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
                     List<List<String>> stockInfo = getStock (client, orgName, title);
                     if (stockInfo != null) {
                         // 若果某个账号的数据不为空时
-                        if (stockInfo.size () != 1) {
+                        if (stockInfo.size () != 0) {
                             FileUtil.createExcel (stockInfo, stockChildFile, title);
                             logger.info ("生成库存 " + stockChildFile);
                             // 删除现有库存文件
@@ -198,20 +148,23 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
 
     /**
      * 销售
-     * @param client 客户端
+     *
+     * @param client  客户端
      * @param orgCode 商业code
      * @param orgName 商业name
      */
-    protected void sale (CloseableHttpClient client, String orgCode, String orgName){
+    protected void sale (CloseableHttpClient client, String orgCode, String orgName) {
         try {
-            String saleFile = "D:\\XJPFile\\auto17\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/S" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (0, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
-            String bakFileS = "D:\\XJPFile\\bak\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/S" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (0, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
+            String saleFile = dir + "\\S"
+                    + orgCode.split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
+            String bakFile = bakDir + "\\S" + orgCode.split ("-")[0]
+                    + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
             title = createSale ();
             if (title == null) {
-                title=defaultSale ();
+                title = TitleConfig.getTitle ().get (1);
             }
             if (!merge) {
-                if ((FileUtil.checkFile (saleFile)) || (FileUtil.checkFile (bakFileS))) {
+                if ((FileUtil.checkFile (saleFile)) || (FileUtil.checkFile (bakFile))) {
                     logger.info ("流向已生成");
                 } else {
 
@@ -229,8 +182,9 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
                 // 多账号
             } else {
                 // 创建子文件
-                String childDir = dir + "/" + orgCode.concat ("_").concat (orgName.split ("-")[0]);
-                String saleChildFile = childDir + "/S" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
+                String childDir = dir + "/" + orgCode.split ("-")[0].concat (orgName);
+                // 创建子文件名称
+                String saleChildFile = childDir + "/S" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + orgName + ".xls";
                 File dirFile = new File (childDir);
                 if (!dirFile.exists ()) {
                     dirFile.mkdirs ();
@@ -262,23 +216,25 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
 
     /**
      * 采购
-     * @param client 客户端
+     *
+     * @param client  客户端
      * @param orgCode 商业code
      * @param orgName 商业name
      */
-    protected void  purchase (CloseableHttpClient client, String orgCode, String orgName){
+    protected void purchase (CloseableHttpClient client, String orgCode, String orgName) {
         try {
 
 
-            String purchasFile = "D:\\XJPFile\\auto17\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/P" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
-
-            String bakFileP = "D:\\XJPFile\\bak\\" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "/P" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName.split ("-")[0] + ".xls";
+            String purchasFile = dir + "\\P"
+                    + orgCode.split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
+            String bakFile = bakDir + "\\P" + orgCode.split ("-")[0]
+                    + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
             title = createPurchase ();
             if (title == null) {
-                title=defaultPurchase ();
+                title = TitleConfig.getTitle ().get (2);
             }
             if (!merge) {
-                if ((FileUtil.checkFile (purchasFile)) || (FileUtil.checkFile (bakFileP))) {
+                if ((FileUtil.checkFile (purchasFile)) || (FileUtil.checkFile (bakFile))) {
                     logger.info ("采购已生成 ");
                 } else {
                     List<List<String>> purchasInfo = getPurchase (client, orgName, title);
@@ -295,9 +251,9 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
 
             } else {
                 // 创建子文件
-                String childDir = dir + "/" + orgCode.concat ("_").concat (orgName.split ("-")[0]);
+                String childDir = dir + "/" + orgCode.split ("-")[0].concat (orgName);
                 // 创建子文件名称
-                String purchasChildFile = childDir + "/P" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + orgName + ".xls";
+                String purchasChildFile = childDir + "/P" + orgCode + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + orgName + ".xls";
                 File dirFile = new File (childDir);
                 // 判断子文件路径是否存在
                 if (!dirFile.exists ()) {
@@ -325,17 +281,11 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
                     }
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error ("获取" + orgName + "采购数据过程中发生错误！");
             e.printStackTrace ();
         }
     }
-
-
-    /*
-     * 子类用父类的content、rows,每一个子类会new新的content和rows吗？
-     * 添加excel内容
-     */
 
     /**
      * 根据表头对应位置，修改每行对应的单元格内容
@@ -345,36 +295,23 @@ public abstract class ExcelDemo implements Stock, Sale, Purchase {
      * @param a    表头对应位置
      */
     protected void addCell (List<String> rows, String cell, int a) {
-        rows.set (a, cell);
+        rows.set (a - 1, cell);
     }
 
     /**
      * 先根据title列数添加列数相同的空元素的行
-     * @param rows 行
-     * @param title 表头
+     *
+     * @param content 表空间
+     * @param rows    行
+     * @param title   表头
      * @return 返回行
      */
-    protected List<String> addRows (List<String> rows, Title<String> title) {
-        for (int i = 0; i < title.len (); i++) {
+    protected List<List<String>> addRows (List<List<String>> content, List<String> rows, List<String> title) {
+        for (int i = 0; i < title.size (); i++) {
             rows.add ("");
-            rows.toArray ()[getKey (title.local (), title.local ().get (i))] = "";
+            rows.toArray ()[i] = "";
         }
         content.add (rows);
-        return rows;
-    }
-
-    /**
-     * 根据value取key值,
-     * 因为title是不重复的,可以这么取
-     */
-    protected static Integer getKey (Map<Integer, String> map, String value) {
-        Integer key = null;
-        //Map,HashMap并没有实现Iteratable接口.不能用于增强for循环.
-        for (Integer getKey : map.keySet ()) {
-            if (map.get (getKey).equals (value)) {
-                key = getKey;
-            }
-        }
-        return key;
+        return content;
     }
 }

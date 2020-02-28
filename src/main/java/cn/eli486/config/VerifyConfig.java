@@ -1,7 +1,7 @@
 package cn.eli486.config;
 
 import cn.eli486.entity.Customer;
-import cn.eli486.imp.VerifyDemo;
+import cn.eli486.excel.AbstractionVerify;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -37,11 +37,11 @@ public class VerifyConfig {
     /**
      * verifyAction存储orgCode和对应所有执行类，在项目启动时就已加载
      */
-    private static Map<String, VerifyDemo> verifyAction= new HashMap<> ();
+    private static Map<String, AbstractionVerify> verifyAction= new HashMap<> ();
     /**
      * toDoAction是当前执行任务列表
      */
-    public static Map<String, VerifyDemo> toDoAction = new HashMap<> ();
+    public static Map<String, AbstractionVerify> toDoAction = new HashMap<> ();
     /**
      * map是为了得到对应Customer属性值
      */
@@ -50,8 +50,8 @@ public class VerifyConfig {
     public VerifyConfig () {
         try {
             //加载json文件中所有Customer,因为打成jar访问不到classes目录下json文件，要换成resource.getInputStream ()读取resource.getFile()也不行
-//            File f = new File (VerifyConfig.class.getResource ("/Verifycustomer.json").getPath ());
-            ClassPathResource resource = new ClassPathResource ("Verifycustomer.json");
+//            File f = new File (VerifyConfig.class.getResource ("/verifyCustomer.json").getPath ());
+            ClassPathResource resource = new ClassPathResource ("verifyCustomer.json");
             StringBuilder builder =new StringBuilder ();
             InputStreamReader inputStreamReader=new InputStreamReader (resource.getInputStream (),"utf-8");
             BufferedReader bufferedReader=new BufferedReader (inputStreamReader);
@@ -69,7 +69,7 @@ public class VerifyConfig {
             for (Customer customer : customers
             ) {
                 map.put (customer.getOrgcode (), customer);
-                VerifyDemo verifyDemo = (VerifyDemo) Class.forName (customer.getAction ()).newInstance ();
+                AbstractionVerify verifyDemo = (AbstractionVerify) Class.forName (customer.getAction ()).newInstance ();
                 verifyDemo.setOrgCode (customer.getOrgcode ());
                 System.out.println (customer.getOrgcode ()+" -----"+customer.getAction ());
                 verifyDemo.setOrgName (customer.getOrgname ());
@@ -82,13 +82,18 @@ public class VerifyConfig {
         }
     }
 
+
+    public  void showVerify(){
+
+    }
+
     /**
      * 获取对应验证码
      * @param orgCode 对应Customer代码
      * @throws Exception
      */
     public  void getVerifyCode (String orgCode) throws Exception {
-        VerifyDemo verifyActor = verifyAction.get (orgCode);
+        AbstractionVerify verifyActor = verifyAction.get (orgCode);
         verifyActor.getVerifyCode ();
 
     }
@@ -102,7 +107,7 @@ public class VerifyConfig {
      * @throws Exception
      */
     public  void addAction (String orgCode, String verifyCode, boolean merge) throws Exception {
-        VerifyDemo demo = verifyAction.get (orgCode);
+        AbstractionVerify demo = verifyAction.get (orgCode);
         demo.setMerge (merge);
         demo.addVerifyCodeParam (verifyCode);
         toDoAction.put (orgCode + "-" + merge, demo);

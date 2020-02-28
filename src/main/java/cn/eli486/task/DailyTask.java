@@ -1,8 +1,8 @@
 package cn.eli486.task;
 
 import cn.eli486.entity.Customer;
-import cn.eli486.excel.ExcelDemo;
-import cn.eli486.util.WebUtil;
+import cn.eli486.excel.Abstraction;
+import cn.eli486.utils.WebUtil;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.util.HashMap;
@@ -15,12 +15,16 @@ import java.util.Set;
  * 定时任务执行类
  */
 public class DailyTask implements Runnable {
+    private String orgcode;
+    private String orgname;
     private String cron;
     private String classname;
     private Customer customer;
     private boolean status;
 
     public DailyTask (Customer customer) {
+        this.orgcode=customer.getOrgcode ();
+        this.orgname=customer.getOrgname ();
         this.customer = customer;
         this.classname = customer.getAction ();
         this.cron = customer.getDailyTime ();
@@ -31,8 +35,8 @@ public class DailyTask implements Runnable {
     public void run () {
         try {
 
-            ExcelDemo excelDemo = (ExcelDemo) Class.forName (classname).newInstance ();
-            excelDemo.setMerge (customer.isMerge ());
+            Abstraction abstraction = (Abstraction) Class.forName (classname).newInstance ();
+            abstraction.setMerge (customer.isMerge ());
 
             CloseableHttpClient client = WebUtil.getHttpClient ();
             Set<String> strings = customer.getParams ().keySet ();
@@ -46,10 +50,12 @@ public class DailyTask implements Runnable {
                     for (int i = 0; i < para1.length; i++) {
                         Map<String, String> params = new HashMap<> ();
                         params.put (para1[i], para2[i]);
-                        excelDemo.exec (client, params, customer.getOrgcode (), customer.getOrgname ());
+                        abstraction.exec (client, params, customer.getOrgcode (), customer.getOrgname ());
                     }
                 } else {
-                    excelDemo.exec (client, customer.getParams (), customer.getOrgcode (), customer.getOrgname ());
+                    Map<String, String> params = new HashMap<> ();
+                    params.putAll (customer.getParams ());
+                    abstraction.exec (client, params, customer.getOrgcode (), customer.getOrgname ());
                 }
             }
 
@@ -76,5 +82,33 @@ public class DailyTask implements Runnable {
 
     public void setCron (String cron) {
         this.cron = cron;
+    }
+
+    public String getOrgcode () {
+        return orgcode;
+    }
+
+    public void setOrgcode (String orgcode) {
+        this.orgcode = orgcode;
+    }
+
+    public String getOrgname () {
+        return orgname;
+    }
+
+    public void setOrgname (String orgname) {
+        this.orgname = orgname;
+    }
+
+    public void setClassname (String classname) {
+        this.classname = classname;
+    }
+
+    public Customer getCustomer () {
+        return customer;
+    }
+
+    public void setCustomer (Customer customer) {
+        this.customer = customer;
     }
 }

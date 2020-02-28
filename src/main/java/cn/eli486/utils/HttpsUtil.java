@@ -1,8 +1,7 @@
-package cn.eli486.util;
+package cn.eli486.utils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -12,21 +11,17 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.FileInputStream;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -35,38 +30,43 @@ import java.util.Map;
 
 /**
  * @author eli
- * 信任证书验证https
+ * 绕过证书访问https
  */
-public class SelfHttps {
+public class HttpsUtil {
 
     /**
-     * 设置信任自签名证书
+     * 绕过验证
      *
-     * @param keyStorePath		密钥库路径
-     * @param keyStorepass		密钥库密码
      * @return
+     * @throws NoSuchAlgorithmException
+     * @throws KeyManagementException
      */
-    public static SSLContext custom(String keyStorePath, String keyStorepass){
-        SSLContext sc = null;
-        FileInputStream instream = null;
-        KeyStore trustStore = null;
-        try {
-            trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            instream = new FileInputStream (new File (keyStorePath));
-            trustStore.load(instream, keyStorepass.toCharArray());
-            // 相信自己的CA和所有自签名的证书
-            sc = SSLContexts.custom().loadTrustMaterial(trustStore, new TrustSelfSignedStrategy ()).build();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException | KeyManagementException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                instream.close();
-            } catch (IOException e) {
+    private static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
+        SSLContext sc = SSLContext.getInstance("SSLv3");
+
+        // 实现一个X509TrustManager接口，用于绕过验证，不用修改里面的方法
+        X509TrustManager trustManager = new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(
+                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
+                    String paramString) throws CertificateException {
             }
-        }
+
+            @Override
+            public void checkServerTrusted(
+                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
+                    String paramString) throws CertificateException {
+            }
+
+            @Override
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+        };
+
+        sc.init(null, new TrustManager[] { trustManager }, null);
         return sc;
     }
-
 
 
     /**
@@ -76,19 +76,15 @@ public class SelfHttps {
      * @param map	参数列表
      * @param encoding	编码
      * @return
-     * @throws ParseException
-     * @throws IOException
-     * @throws KeyManagementException
      * @throws NoSuchAlgorithmException
+     * @throws KeyManagementException
+     * @throws IOException
      * @throws ClientProtocolException
      */
-    public static String send(String url, Map<String,String> map, String encoding) throws ClientProtocolException, IOException {
+    public static String send(String url, Map<String,String> map,String encoding) throws KeyManagementException, NoSuchAlgorithmException, ClientProtocolException, IOException {
         String body = "";
-        String keystoreFile = "C:\\Users\\user\\Desktop\\fiddle.keystore";
-        String keystorePass = "changeit";
-        //tomcat是我自己的密钥库的密码，你可以替换成自己的
-        //如果密码为空，则用"nopassword"代替
-        SSLContext sslcontext = custom(keystoreFile, keystorePass);
+        //采用绕过验证的方式处理https请求
+        SSLContext sslcontext = createIgnoreVerifySSL();
 
         // 设置协议http和https对应的处理socket链接工厂的对象
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
@@ -136,4 +132,6 @@ public class SelfHttps {
         response.close();
         return body;
     }
+
+
 }

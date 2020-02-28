@@ -2,154 +2,172 @@
 <!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="">
-		<meta name="author" content="">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-		<title>Dashboard Template for Bootstrap</title>
-		<!-- Bootstrap core CSS -->
-		<link href="asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}" rel="stylesheet">
+    <title>无验证码</title>
+    <!-- Bootstrap core CSS -->
+    <link href="../../static/asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}"
+          rel="stylesheet">
 
-		<!-- Custom styles for this template -->
-		<link href="asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
-		<style type="text/css">
-			/* Chart.js */
-			
-			@-webkit-keyframes chartjs-render-animation {
-				from {
-					opacity: 0.99
-				}
-				to {
-					opacity: 1
-				}
-			}
-			
-			@keyframes chartjs-render-animation {
-				from {
-					opacity: 0.99
-				}
-				to {
-					opacity: 1
-				}
-			}
-			
-			.chartjs-render-monitor {
-				-webkit-animation: chartjs-render-animation 0.001s;
-				animation: chartjs-render-animation 0.001s;
-			}
-		</style>
-	</head>
+    <!-- Custom styles for this template -->
+    <link href="../../static/asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
+    <style type="text/css">
+        /* Chart.js */
 
-	<body>
-		<div class="container-fluid">
-			<div class="row">
-				<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
-					<h2><a class="btn btn-sm btn-success" href="/customer" th:href="@{/customer}">商业添加</a></h2>
-					<div class="table-responsive">
-						<table class="table table-striped table-sm">
-							<thead>
-							<tr>
-								<th>#</th>
-								<th>经销商代码</th>
-								<th>经销商名称</th>
-								<th>账号密码</th>
-								<th>网址</th>
-								<th>定时时间</th>
-								<th>执行类</th>
-								<th>加入任务</th>
-								<th>执行任务</th>
-								<th>停止任务</th>
-							</tr>
-							</thead>
-							<tbody>
-							<tr th:each="customer:${customers}">
-								<td th:text="${customerStat.index}+1"></td>
-								<td th:text="${customer.orgcode}"></td>
-								<td>[[${customer.orgname}]]</td>
-								<td th:text="${customer.params}"></td>
-								<td><a th:href="${customer.website}">[[${customer.website}]]</a></td>
-								<td th:text="${customer.dailyTime}"></td>
-								<td th:text="${customer.action}"></td>
-								<td>
-									<a class="btn btn-sm btn-primary addBtn"   th:onclick="addCode([[${customer.orgcode}]]);" >加入</a>
-								</td>
-								<td>
-								<a class="btn btn-sm btn-primary doBtn"   th:onclick="doCode([[${customer.orgcode}]]);">执行</a>
-								</td>
-								<td>
-									<a class="btn btn-sm btn-primary stopBtn"   th:attr="stop_uri=@{/customers/}+${customer.orgcode}" >停止</a>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</main>
-				<form id="stopForm"  method="put">
-					<input type="hidden" name="_method" value="delete"/>
-				</form>
-			</div>
-		</div>
+        @-webkit-keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
 
-		<!-- Bootstrap core JavaScript
-    ================================================== -->
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script type="text/javascript" src="asserts/js/jquery-3.2.1.slim.min.js" th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
-		<script type="text/javascript" src="asserts/js/popper.min.js" th:src="@{/asserts/js/popper.min.js}"></script>
-		<script type="text/javascript" src="asserts/js/bootstrap.min.js" th:src="@{/asserts/js/bootstrap.min.js}"></script>
+        @keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+    </style>
+</head>
 
-		<!-- Icons -->
-		<script type="text/javascript" src="asserts/js/feather.min.js" th:src="@{/asserts/js/feather.min.js}"></script>
-		<script>
-			feather.replace()
-		</script>
-		<script type="text/javascript" th:inline="javascript">
-			function addCode(orgCode) {
-				$.ajax({
-					url: "customers/add"+orgCode,
-					type: "POST",
-					cache: false,
-					async: false,
-					success: function (result) {
-						if("success"==result){
-							alert('加入任务成功');
-						}else{
-							alert('加入任务失败');
-						}
-					},
-					error:function (html) {
-						alert('服务器发生错误');
-					}
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+            <h2><a class="btn btn-sm btn-success" th:href="@{/verifyCustomers}" th:text="${type}=='Y'?'无验证码':'验证码'">跳转</a>
+                <input class="btn btn-sm btn-primary" style="margin-left: 50px" type="button" value="重跑" th:onclick="retry()"/>
+            </h2>
+            <div class="table-responsive">
+                <table id="sampleTableA" class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>经销商代码</th>
+                        <th>经销商名称</th>
+                        <th>账号密码</th>
+                        <th>网址</th>
+                        <th>定时时间</th>
+                        <th>加入任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="customer:${customers}">
+                        <td th:text="${customerStat.index}+1"></td>
+                        <td th:text="${customer.orgcode}"></td>
+                        <td>[[${customer.orgname}]]</td>
+                        <td th:text="${customer.params}"></td>
+                        <td><a th:href="${customer.website}" target="_blank">[[${customer.website}]]</a></td>
+                        <td th:text="${customer.dailyTime}"></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary addBtn"
+                               th:onclick="addCode([[${customer.orgcode}]])">加入</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style=" position: fixed; _position: absolute;top: 10px; right: 1px; _bottom: auto;
+                    padding: 1px;
+               z-index: 9999999; width:100px; height:30px;" class="p-t_10">
+                    <input class="btn btn-sm btn-primary" type="button" value="执行任务" th:onclick="doCode()"/>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
-				});
-			}
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="../../static/asserts/js/jquery-3.2.1.slim.min.js"
+        th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+<script type="text/javascript" src="../../static/asserts/js/popper.min.js"
+        th:src="@{/asserts/js/popper.min.js}"></script>
+<script type="text/javascript" src="../../static/asserts/js/bootstrap.min.js"
+        th:src="@{/asserts/js/bootstrap.min.js}"></script>
+<script src="../../static/asserts/js/fancyTable.js" th:src="@{/asserts/js/fancyTable.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(document).ready(function () {
+        // And make them fancy
+        $("#sampleTableA").fancyTable({
+            sortColumn: 0,
+            pagination: true,
+            perPage: 2,
+            globalSearch: true
+        });
+    });
 
-			function doCode(orgCode) {
-				$.ajax({
-					url: "customers/do"+orgCode,
-					type: "POST",
-					cache: false,
-					async: false,
-					success: function (result) {
-						if("success"==result){
-							alert('执行任务成功');
-						}else{
-							alert('当前无任务');
-						}
-					},
-					error:function (html) {
-						alert('服务器发生错误');
-					}
+    function addCode(orgCode) {
+        $.ajax({
+            url: "customers/add/" + orgCode,
+            type: "POST",
+            cache: false,
+            async: false,
+            success: function (result) {
+                if (result['code']==200) {
+                    alert("加入任务列表");
+                } else {
+                    alert(result['message']);
+                }
+            },
+            error: function () {
+                alert('服务器发生错误');
+            }
 
-				});
-			}
-			$(".stopBtn").click(function(){
-				$("#stopForm").attr("action",$(this).attr("stop_uri")).submit();
-				alert("停用任务");
-				return false;
-			});
-		</script>
-	</body>
+        });
+    }
+
+    function doCode() {
+        $.ajax({
+            url: "customers/do",
+            type: "POST",
+            cache: false,
+            async: false,
+            success: function (result) {
+                if (result['code']==200) {
+                    alert(result['message']);
+                }else if (result['code'] == 500) {
+                    alert(result['message']);
+                }else {
+                    alert("正在执行其他任务")
+                }
+            },
+            error: function () {
+                alert('服务器发生错误');
+            }
+
+        });
+    }
+
+    function retry() {
+        $.ajax({
+            url: "customers/retry",
+            type: "POST",
+            cache: false,
+            async: false,
+            success: function (result) {
+                if (result['code']==200) {
+                    alert(result['message']);
+                }else if (result['code'] == 500) {
+                    alert(result['message']);
+                }else {
+                    alert("正在执行其他任务")
+                }
+            },
+            error: function () {
+                alert('服务器发生错误');
+            }
+
+        });
+    }
+</script>
+</body>
 
 </html>

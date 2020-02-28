@@ -1,11 +1,12 @@
-package cn.eli486.imp;
+package cn.eli486.excel;
 
 import cn.eli486.config.GlobalInfo;
-import cn.eli486.excel.ExcelDemo;
-import cn.eli486.util.DateUtil;
-import cn.eli486.util.WebUtil;
+import cn.eli486.utils.DateUtil;
+import cn.eli486.utils.WebUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * @author eli
  */
-public abstract class VerifyDemo extends ExcelDemo {
+public abstract class AbstractionVerify extends Abstraction {
     protected String orgName;
     protected String orgCode;
     protected Map<String, String> loginParams = new HashMap<String, String> ();
@@ -35,15 +36,12 @@ public abstract class VerifyDemo extends ExcelDemo {
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
-
     public  void getVerifyCode() throws Exception{
         client = WebUtil.getHttpClient ();
-//        FileUtils.deleteQuietly (new File (GlobalInfo.verifyStorePath + "/" + orgCode + ".jpg"));
+        File f = new File (GlobalInfo.verifyStorePath + "/" + orgCode + ".jpg");
+        FileUtils.deleteQuietly (f);
         WebUtil.httpGet (client, getLoginUrl());
-        Long s = System.currentTimeMillis ();
         WebUtil.requestFile(client, getPictureUrl(), GlobalInfo.verifyStorePath + "/" + orgCode + ".jpg");
-        Long e =System.currentTimeMillis ();
-        System.out.println ("耗时：-----"+(e-s));
     }
 
     public void addLoginParam(String name, String value) {
@@ -57,7 +55,7 @@ public abstract class VerifyDemo extends ExcelDemo {
     protected void login() throws IOException {
         Map<String,String> params = new HashMap<> ();
         params.putAll(loginParams);
-        WebUtil.httpPost (client,params,getLoginUrl ());
+        String str=WebUtil.httpPost (client,params,getLoginUrl ());
 
     }
 
@@ -73,9 +71,13 @@ public abstract class VerifyDemo extends ExcelDemo {
                 ex.printStackTrace ();
             }
         }
-        String dir = "D:/XJPFile/auto17/" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd");
+
+
         stock (client, orgCode, orgName);
         sale (client, orgCode, orgName);
         purchase (client, orgCode, orgName);
+
+        logger.info (orgName + "  " + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "  日报完成");
+        logger.info ("------------------------------------------------------------------------------------------------------");
     }
 }

@@ -3,13 +3,12 @@ package cn.eli486.controller;
 import cn.eli486.config.ScheduledConfig;
 import cn.eli486.config.VerifyConfig;
 import cn.eli486.entity.Customer;
+import cn.eli486.utils.Result;
+import cn.eli486.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -18,6 +17,7 @@ import java.util.Collection;
  * 有验证码处理
  */
 @Controller
+@RequestMapping("/verifyCustomers")
 public class VerifyController {
     @Autowired
     ScheduledConfig scheduledConfig;
@@ -31,10 +31,11 @@ public class VerifyController {
      * @param model
      * @return
      */
-    @GetMapping ("/verifycustomers")
+    @GetMapping ({"/",""})
     public String verList (Model model) {
         Collection<Customer> daoAll = VerifyConfig.map.values ();
         model.addAttribute ("customers", daoAll);
+        model.addAttribute ("type","Y");
         return "customer/verifylist";
     }
 
@@ -44,19 +45,18 @@ public class VerifyController {
      * @return
      */
     @ResponseBody
-    @PostMapping ("/customer/get{orgCode}")
-    public String verify (@PathVariable String orgCode) {
+    @RequestMapping("/get/{orgCode}")
+    public Result verify (@PathVariable String orgCode) {
         try {
             if (config.isTodoListFull ()) {
-             return "fail";
+             return new Result<> (StatusCode.ERROR,"任务已满");
             }
             config.getVerifyCode (orgCode);
         } catch (Exception e) {
             e.printStackTrace ();
         }
-        return "success";
+        return new Result<> ();
     }
-
 
     /**
      * 加入任务列表
@@ -66,15 +66,18 @@ public class VerifyController {
      * @return
      */
     @ResponseBody
-    @PostMapping ("/customer/add{orgCode}")
-    public String addCode (String verifyCode, boolean merge, @PathVariable String orgCode) {
+    @PostMapping ("/add/{orgCode}")
+    public Result addCode (String verifyCode, boolean merge, @PathVariable String orgCode) {
+        if ("".equals (verifyCode)){
+            return new Result<> (StatusCode.ERROR,"验证码不能为空");
+        }
         System.out.println (verifyCode + merge + orgCode);
         try {
-            config.addAction (orgCode, orgCode, merge);
+            config.addAction (orgCode, verifyCode, merge);
         } catch (Exception e) {
             e.printStackTrace ();
         }
-        return "success";
+        return new Result<> ();
     }
 
 
@@ -83,10 +86,13 @@ public class VerifyController {
      * @return
      */
     @ResponseBody
-    @PostMapping ("/customer/do")
-    public String doExec () {
+    @PostMapping ("/do")
+    public Result doExec () {
+        if(VerifyConfig.toDoAction.size ()==0){
+            return new Result<> (StatusCode.ERROR,"当前无任务");
+        }
         config.exec ();
-        return "success";
+        return new Result<> ();
     }
 
 }

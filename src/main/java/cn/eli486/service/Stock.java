@@ -1,6 +1,5 @@
 package cn.eli486.service;
 
-import cn.eli486.util.Title;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
@@ -17,10 +16,12 @@ public interface Stock {
      * @param title 表头
      * @return 库存数据
      */
-    List<List<String>> getStock (CloseableHttpClient client, String orgName, Title<String> title) throws IOException;
+    List<List<String>> getStock (CloseableHttpClient client, String orgName, List<String> title) throws IOException;
+
     /**
      * 创建库存文件表头
      * @return 表头
      */
-    Title<String> createStock ();
+//
+    List<String> createStock ();
 }

@@ -15,11 +15,10 @@ import java.io.IOException;
 @Controller
 public class LoginController {
 
-
-    @RequestMapping("/login")
+    @RequestMapping ("/login")
     public  String login(String username, String password, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if(username!=null&&"1234".equals (password)){
-            return "dashboard";
+            return "redirect:/customers";
         }
         return "redirect:login.html";
     }
@@ -28,5 +27,7 @@ public class LoginController {
     public String index(){
         return "login";
     }
+
+
 
 }

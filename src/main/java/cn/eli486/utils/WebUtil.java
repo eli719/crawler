@@ -1,4 +1,4 @@
-package cn.eli486.util;
+package cn.eli486.utils;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.*;

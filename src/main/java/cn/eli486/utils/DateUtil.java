@@ -1,4 +1,4 @@
-package cn.eli486.util;
+package cn.eli486.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -8,6 +8,15 @@ import java.util.Date;
  * @author eli
  */
 public class DateUtil {
+	public static String getUserDefinedDay(int userDefinedDays) {
+		Date date = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_YEAR, userDefinedDays);
+		return getDateString(cal.getTime(), "yyyy-MM-dd");
+	}
+
+
 	public static String getDateString(Date date, String pattern) {
 		return (new SimpleDateFormat(pattern)).format(date);
 	}

@@ -1,32 +1,32 @@
 {
   "customers": [
     {
-      "orgcode": "1",
-      "orgname": "aaa",
+      "orgcode": "W702067",
+      "orgname": "青岛百洋医药股份有限公司",
       "params": {
-        "username": "ccc",
-        "password": "ddd"
+        "user": "240",
+        "password": "Welcome103"
       },
-      "website": "www.baidu.com",
-      "dailyTime": "0/30 * 9 * * ?",
+      "website": "http://www.baheal.com/Flow/Home/Index",
+      "dailyTime": "0/30 * 19 * * ?",
       "merge": false,
       "status": true,
-      "type": "Y",
+      "type": "N",
       "action": "cn.eli486.imp.Demo"
     },
     {
-      "orgcode": "21",
-      "orgname": "bbb",
+      "orgcode": "W169027",
+      "orgname": "聚善堂（福建）医药集团有限公司",
       "params": {
-        "username": "qqq",
-        "password": "eeee"
+        "txtadmin": "57",
+        "txtpwd": "1"
       },
-      "website": "www.baidu.com",
-      "dailyTime": "0/20 * 9 * * ?",
+      "website": "http://218.86.35.195:8008/default5.aspx",
+      "dailyTime": "0/20 * 19 * * ?",
       "merge": false,
       "status": true,
-      "type": "Y",
-      "action": "cn.eli486.imp.Demo2"
+      "type": "N",
+      "action": "cn.eli486.imp.Demo3"
     }
   ]
 }

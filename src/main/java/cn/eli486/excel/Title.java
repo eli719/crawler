@@ -1,4 +1,4 @@
-package cn.eli486.util;
+package cn.eli486.excel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * @author eli
  */
+@Deprecated
 public class Title<T>{
 	/**
 	 * 内部构造节点类
