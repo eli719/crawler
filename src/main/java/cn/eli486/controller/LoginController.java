@@ -2,12 +2,13 @@ package cn.eli486.controller;
 
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.StringUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author eli
@@ -15,17 +16,21 @@ import java.io.IOException;
 @Controller
 public class LoginController {
 
-    @RequestMapping ("/login")
-    public  String login(String username, String password, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(username!=null&&"1234".equals (password)){
+    @PostMapping("/login")
+    public  String login(@RequestParam("username") String username,
+                         @RequestParam("password")String password,
+                         HttpSession session, Model model) {
+        if(!StringUtils.isEmpty (username)&&"1234".equals (password)){
+            session.setAttribute ("user",username);
             return "redirect:/customers";
         }
-        return "redirect:login.html";
+        model.addAttribute ("msg","用户名或密码错误");
+        return "index";
     }
 
-    @RequestMapping("/")
+    @GetMapping ("/")
     public String index(){
-        return "login";
+        return "index";
     }
 
 

@@ -1,5 +1,7 @@
 package cn.eli486.utils;
 
+import cn.eli486.config.GlobalInfo;
+import cn.eli486.entity.Customer;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -68,7 +70,64 @@ public  class FileUtil {
 		File file = new File(fileName);
 		return file.exists ();
 	}
-	
+
+
+	public static List<Boolean> hasExistFileList(Customer customer) {
+		String stockFile;
+		String bakFileV;
+		String fileNameV;
+		String saleFile;
+		String bakFileS;
+		String fileNameS;
+		String purchaseFile;
+		String bakFileP;
+		String fileNameP;
+		if (customer.getFilesName () == null) {
+			stockFile = GlobalInfo.DIR + "/V"
+					+ customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+			bakFileV = GlobalInfo.BAK_DIR + "/V" + customer.getOrgcode ().split ("-")[0]
+					+ "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+
+			saleFile = GlobalInfo.DIR + "/S"
+					+ customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+			bakFileS = GlobalInfo.BAK_DIR + "/S" + customer.getOrgcode ().split ("-")[0]
+					+ "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+
+			purchaseFile = GlobalInfo.DIR + "/P"
+					+ customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+			bakFileP = GlobalInfo.BAK_DIR + "/P" + customer.getOrgcode ().split ("-")[0]
+					+ "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+		}else {
+			fileNameV = customer.getFilesName ().get (0)+".xls";
+			fileNameV=parseFileName(fileNameV,customer);
+			stockFile = GlobalInfo.DIR+fileNameV;
+			bakFileV = GlobalInfo.BAK_DIR+fileNameV;
+
+			fileNameS = customer.getFilesName ().get (1)+".xls";
+			fileNameS=parseFileName(fileNameS,customer);
+			saleFile = GlobalInfo.DIR+fileNameS;
+			bakFileS = GlobalInfo.BAK_DIR+fileNameS;
+
+			fileNameP = customer.getFilesName ().get (2)+".xls";
+			fileNameP=parseFileName(fileNameP,customer);
+			purchaseFile = GlobalInfo.DIR+fileNameP;
+			bakFileP = GlobalInfo.BAK_DIR+fileNameP;
+		}
+		List<Boolean> list = new ArrayList<> ();
+		boolean isExistStockFile;
+		isExistStockFile = (FileUtil.checkFile (stockFile)) || (FileUtil.checkFile (bakFileV));
+
+		boolean isExistSaleFile;
+		isExistSaleFile = (FileUtil.checkFile (saleFile)) || (FileUtil.checkFile (bakFileS));
+
+		boolean isExistPurchaseFile;
+		isExistPurchaseFile = (FileUtil.checkFile (purchaseFile)) || (FileUtil.checkFile (bakFileP));
+		list.add(isExistStockFile);
+		list.add(isExistSaleFile);
+		list.add(isExistPurchaseFile);
+		return list;
+	}
+
 	/**
 	 * 检查并创建文件夹
 	 */
@@ -127,5 +186,16 @@ public  class FileUtil {
 			}
 		}
 		return data;
+	}
+
+
+	public static String parseFileName(String fileName,Customer customer){
+		if(!fileName.contains ("{")){
+			return fileName;
+		}
+		fileName=fileName.replace ("{orgCode}",customer.getOrgcode ());
+		fileName=fileName.replace ("{orgName}",customer.getOrgname ());
+		String date = fileName.substring (fileName.indexOf ("{yyyy"),fileName.indexOf ("d}")+2);
+		return fileName.replace (date,DateUtil.getBeforeDayAgainstToday (1,date));
 	}
 }

@@ -1,32 +1,36 @@
 {
   "customers": [
     {
-      "orgcode": "W702067",
-      "orgname": "青岛百洋医药股份有限公司",
+      "orgcode": "DM0502979",
+      "orgname": "华润襄阳医药有限公司",
       "params": {
-        "user": "240",
-        "password": "Welcome103"
+        "txtname": "1001772",
+        "txtpwd": "XAYS123"
       },
-      "website": "http://www.baheal.com/Flow/Home/Index",
-      "dailyTime": "0/30 * 19 * * ?",
+      "website": "http://61.183.138.78:8090/index.aspx",
+      "dailyTime": "0 0 9 * * ?",
       "merge": false,
       "status": true,
       "type": "N",
-      "action": "cn.eli486.imp.Demo"
+      "action": "cn.eli486.imp.CodeDM0502979Action",
+      "filesName": ["a","b","c"],
+      "doStatus": [0,0,0]
     },
     {
-      "orgcode": "W169027",
-      "orgname": "聚善堂（福建）医药集团有限公司",
+      "orgcode": "W139028",
+      "orgname": "浙江华圣药业集团有限公司",
       "params": {
-        "txtadmin": "57",
-        "txtpwd": "1"
+        "tbLoginName": "xays",
+        "tbPassword": "hsyy2014"
       },
-      "website": "http://218.86.35.195:8008/default5.aspx",
-      "dailyTime": "0/20 * 19 * * ?",
+      "website": "http://112.11.203.72:30/Login.aspx",
+      "dailyTime": "0 0 9 * * ?",
       "merge": false,
       "status": true,
       "type": "N",
-      "action": "cn.eli486.imp.Demo3"
+      "action": "cn.eli486.imp.CodeW139028Action",
+      "filesName": ["c","d","e"],
+      "doStatus": [0,0,0]
     }
   ]
 }

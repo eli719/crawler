@@ -52,7 +52,7 @@ public class Demo4 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getPurchase (CloseableHttpClient client, String orgName, List<String> title) {
+    public List<List<String>> getPurchase (CloseableHttpClient client,  List<String> title) {
         return null;
     }
 
@@ -63,7 +63,7 @@ public class Demo4 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getSale (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
+    public List<List<String>> getSale (CloseableHttpClient client, List<String> title) throws IOException {
         return null;
     }
 
@@ -74,7 +74,7 @@ public class Demo4 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getStock (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
+    public List<List<String>> getStock (CloseableHttpClient client,  List<String> title) throws IOException {
         List<String> rows = null;
         String str = WebUtil.httpGet (client, "http://e.hjt360.cn/bill/view/multibill?billKey=changjiakucunquery");
         loginParams.clear();
@@ -123,7 +123,7 @@ public class Demo4 extends AbstractionVerify {
     public static void main (String[] args) throws IOException {
         CloseableHttpClient client = WebUtil.getHttpClient ();
         String s = WebUtil.httpGet (client, "http://e.hjt360.cn/login/login.html");
-        WebUtil.requestFile (client,"http://e.hjt360.cn/authimg","d:\\1.jpg");
+        WebUtil.getFile (client,"http://e.hjt360.cn/authimg","d:\\1.jpg");
         String sr = FileUtils.readFileToString (new File ("d:\\code.txt"),"utf-8");
         Map<String,String> loginparams = new HashMap<> ();
         loginparams.put("username", "ys");

@@ -50,12 +50,12 @@ public class DailyTask implements Runnable {
                     for (int i = 0; i < para1.length; i++) {
                         Map<String, String> params = new HashMap<> ();
                         params.put (para1[i], para2[i]);
-                        abstraction.exec (client, params, customer.getOrgcode (), customer.getOrgname ());
+                        abstraction.exec (client, params, customer);
                     }
                 } else {
                     Map<String, String> params = new HashMap<> ();
                     params.putAll (customer.getParams ());
-                    abstraction.exec (client, params, customer.getOrgcode (), customer.getOrgname ());
+                    abstraction.exec (client, params, customer);
                 }
             }
 
