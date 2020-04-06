@@ -3,6 +3,7 @@ package cn.eli486.task;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
 
@@ -14,11 +15,11 @@ import java.io.File;
 @EnableScheduling
 public class CopyTask {
 
-//    @Scheduled(cron = "* * 15 * * ?")
+    @Scheduled(cron = "* * 10 * * ?")
     public void copy () {
         try {
             String str = "D:\\XJPFile\\auto17\\";
-            String bak = "D:\\XJPFile\\bak17";
+            String bak = "D:\\XJPFile\\bak";
             File f = new File (str);
             String[] list = f.list ();
             if (list.length==0){
@@ -35,9 +36,8 @@ public class CopyTask {
     }
 
     public static void main (String[] args) {
-        String s = "<td align=\"left\"><a target=\"_blank\" href=\"/ws/628.php/Storage/index?stdid=483828\">新泰林(注射用五水头孢唑林钠)</a> </td>";
-        s=s.replaceAll ("<td align=\"left\"><a target=\"_blank\" href\\S*>","b");
-        System.out.println (s);
+        CopyTask copyTask = new CopyTask ();
+        copyTask.copy ();
     }
 
 }

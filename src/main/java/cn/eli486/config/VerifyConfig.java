@@ -23,11 +23,11 @@ public class VerifyConfig {
     /**
      * busy是用来lock验证码任务执行过程的
      */
-    private Boolean busy = false;
+    private  Boolean busy = false;
     /**
      *  以下几个变量是类变量，用来处理多账号合并的，因为类变量共享状态，所以要加锁处理
     */
-//    public static String MultiVerCode = "";
+    public static String MultiVerCode = "";
     public static String[] MultiStockInfo = null;
     public static String[] MultiSaleInfo = null;
     public static String[] MultiPurchaseInfo = null;
@@ -41,7 +41,7 @@ public class VerifyConfig {
     /**
      * toDoAction是当前执行任务列表
      */
-    public  Map<String, AbstractionVerify> toDoAction = new HashMap<> ();
+    public static Map<String, AbstractionVerify> toDoAction = new HashMap<> ();
     /**
      * map是为了得到对应Customer属性值
      */
@@ -55,7 +55,7 @@ public class VerifyConfig {
             StringBuilder builder =new StringBuilder ();
             InputStreamReader inputStreamReader=new InputStreamReader (resource.getInputStream (),"utf-8");
             BufferedReader bufferedReader=new BufferedReader (inputStreamReader);
-            String s;
+            String s = null;
             while ((s=bufferedReader.readLine ())!=null) {
                 builder.append (s);
             }
@@ -70,7 +70,6 @@ public class VerifyConfig {
             ) {
                 map.put (customer.getOrgcode (), customer);
                 AbstractionVerify verifyDemo = (AbstractionVerify) Class.forName (customer.getAction ()).newInstance ();
-                verifyDemo.setCustomer (customer);
                 verifyDemo.setOrgCode (customer.getOrgcode ());
                 System.out.println (customer.getOrgcode ()+" -----"+customer.getAction ());
                 verifyDemo.setOrgName (customer.getOrgname ());
@@ -111,7 +110,7 @@ public class VerifyConfig {
         AbstractionVerify demo = verifyAction.get (orgCode);
         demo.setMerge (merge);
         demo.addVerifyCodeParam (verifyCode);
-        toDoAction.put (orgCode, demo);
+        toDoAction.put (orgCode + "-" + merge, demo);
     }
 
     public boolean isTodoListFull(){
@@ -119,7 +118,6 @@ public class VerifyConfig {
         int todoMax = 5;
         return toDoAction.size() > todoMax;
     }
-
 
     /**
      * 执行任务
@@ -131,8 +129,8 @@ public class VerifyConfig {
         try {
             for (String orgCode :
                     toDoAction.keySet ()) {
-//                String[] info = orgCode.split ("-");
-//                VerifyConfig.MultiVerCode = info[1];
+                String[] info = orgCode.split ("-");
+                VerifyConfig.MultiVerCode = info[1];
                 toDoAction.get (orgCode).doExec ();
             }
             VerifyConfig.MultiSaleInfo = null;

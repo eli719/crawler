@@ -12,10 +12,11 @@ public interface Stock {
     /**
      * 获取库存数据
      * @param client 客户端
+     * @param orgName 商家名称
      * @param title 表头
      * @return 库存数据
      */
-    List<List<String>> getStock (CloseableHttpClient client, List<String> title) throws IOException;
+    List<List<String>> getStock (CloseableHttpClient client, String orgName, List<String> title) throws IOException;
 
     /**
      * 创建库存文件表头

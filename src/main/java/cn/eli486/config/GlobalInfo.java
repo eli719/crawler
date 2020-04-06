@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class GlobalInfo {
+	public static  String fileNamePrefix="";
 	/**
 	 * 验证码图片存储地址
 	 */
@@ -15,10 +16,7 @@ public class GlobalInfo {
 	/**
 	 * 查询日期范围
 	 */
-	public static final String BEGIN_DATE = DateUtil.getBeforeDayAgainstToday(60,"yyyy-MM-dd");
-	public static final String END_DATE = DateUtil.getBeforeDayAgainstToday(1,"yyyy-MM-dd");
+	public static  String beginDate = DateUtil.getBeforeDayAgainstToday(60,"yyyy-MM-dd");
+	public static  String endDate = DateUtil.getBeforeDayAgainstToday(1,"yyyy-MM-dd");
 
-
-	public static final String DIR = "D:/XJPFile/auto17/" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd")+"/";
-	public static final String BAK_DIR = "D:/XJPFile/bak/" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd")+"/";
 }

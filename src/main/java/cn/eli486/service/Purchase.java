@@ -11,10 +11,11 @@ public interface Purchase {
     /**
      * 获取采购数据
      * @param client 客户端
+     * @param orgName 商家名称
      * @param title 表头
      * @return 采购数据
      */
-    List<List<String>> getPurchase (CloseableHttpClient client, List<String> title) throws Exception;
+    List<List<String>> getPurchase (CloseableHttpClient client, String orgName, List<String> title);
 
     /**
      * 创建采购文件表头

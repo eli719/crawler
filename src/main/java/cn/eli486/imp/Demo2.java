@@ -44,7 +44,7 @@ public class Demo2 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getPurchase (CloseableHttpClient client,  List<String> title) {
+    public List<List<String>> getPurchase (CloseableHttpClient client, String orgName, List<String> title) {
         return null;
     }
 
@@ -55,7 +55,7 @@ public class Demo2 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getSale (CloseableHttpClient client,  List<String> title) throws IOException {
+    public List<List<String>> getSale (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
         return null;
     }
 
@@ -66,7 +66,7 @@ public class Demo2 extends AbstractionVerify {
 
 
     @Override
-    public List<List<String>> getStock (CloseableHttpClient client,  List<String> title) throws IOException {
+    public List<List<String>> getStock (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
         List<String> rows = null;
         String str = WebUtil.httpGet (client,
                 "https://redirect.gzmpc.com/gzmpcscm3/extjsgridQueryServlet/query?_dc=1573006942787&startIndex=0&pageRowNum=15&needpagecount=true&gridcode=func-salesstquery-grid&queryType=query&dataSource=salesstqueryquery&stagetype=SALESFLOWS&stageid=24&querymoduleid=FuncSalesstqueryNorQuery&sumfieldnames=goodsqty&oper_length=0&page=1&start=0&limit=25");

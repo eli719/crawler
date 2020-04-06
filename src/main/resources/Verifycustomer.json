@@ -12,8 +12,7 @@
       "merge": true,
       "status": true,
       "type": "Y",
-      "action": "cn.eli486.imp.Demo2",
-      "doStatus": [0,0,0]
+      "action": "cn.eli486.imp.Demo2"
     },
     {
       "orgcode": "DM0522585",
@@ -25,42 +24,9 @@
       "website": "http://e.hjt360.cn/login/login.html",
       "dailyTime": "0/20 * 9 * * ?",
       "merge": false,
-      "status": false,
+      "status": true,
       "type": "Y",
-      "action": "cn.eli486.imp.Demo4",
-      "doStatus": [0,0,0]
-    }
-  ,
-    {
-      "orgcode": "W703846",
-      "orgname": "上药控股江门有限公司",
-      "params": {
-        "user_id": "01140",
-        "password": "149266"
-      },
-      "website": "http://lx.jmjyt.com/login.php",
-      "dailyTime": "0/20 * 9 * * ?",
-      "merge": false,
-      "status": false,
-      "type": "Y",
-      "action": "cn.eli486.imp.CodeW703846VerifyAbstraction",
-      "doStatus": [0,0,0]
-    }
-  ,
-    {
-      "orgcode": "W021019",
-      "orgname": "北京上药爱心伟业医药有限公司",
-      "params": {
-        "username": "bj60340",
-        "password": "a123456"
-      },
-      "website": "http://passport.shaphar.com/cas-webapp-server/login",
-      "dailyTime": "0/20 * 9 * * ?",
-      "merge": false,
-      "status": false,
-      "type": "Y",
-      "action": "cn.eli486.imp.CodeW021019VerifyAction",
-      "doStatus": [0,0,0]
+      "action": "cn.eli486.imp.Demo4"
     }
   ]
 }

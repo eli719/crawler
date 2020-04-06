@@ -1,9 +1,0 @@
-server:
-  port: 18080
-spring:
-  application:
-    name: crawler
-  thymeleaf:
-    cache: false
-  profiles:
-    active: dev

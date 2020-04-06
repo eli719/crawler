@@ -8,9 +8,15 @@ import java.util.Date;
  * @author eli
  */
 public class DateUtil {
-	public static String getLastDay(String pattern){
-		return getBeforeDayAgainstToday(1, pattern);
+	public static String getUserDefinedDay(int userDefinedDays) {
+		Date date = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_YEAR, userDefinedDays);
+		return getDateString(cal.getTime(), "yyyy-MM-dd");
 	}
+
+
 	public static String getDateString(Date date, String pattern) {
 		return (new SimpleDateFormat(pattern)).format(date);
 	}
@@ -23,7 +29,12 @@ public class DateUtil {
 		return getDateString(cal.getTime(), pattern);
 	}
 	public static String getBeforeDayAgainstToday(int days, String pattern) {
-		return getBeforeDay(days, pattern, new Date());
+		String date = getBeforeDay(days, pattern, new Date());
+		return date.replaceAll("/", "%2F");
 	}
 	
+	public static void main(String[] args) {
+		String date = DateUtil.getBeforeDayAgainstToday(-1, "yyyyMMdd");
+		System.out.println(date);
+	}
 }

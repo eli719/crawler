@@ -1,6 +1,5 @@
 package cn.eli486.imp;
 
-import cn.eli486.entity.Customer;
 import cn.eli486.excel.Abstraction;
 import cn.eli486.utils.DateUtil;
 import cn.eli486.utils.StringUtil;
@@ -8,7 +7,10 @@ import cn.eli486.utils.WebUtil;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Demo3 extends Abstraction {
     @Override
@@ -30,7 +32,7 @@ public class Demo3 extends Abstraction {
     }
 
     @Override
-    public List<List<String>> getPurchase (CloseableHttpClient client,  List<String> title) {
+    public List<List<String>> getPurchase (CloseableHttpClient client, String orgName, List<String> title) {
         return null;
     }
 
@@ -40,7 +42,7 @@ public class Demo3 extends Abstraction {
     }
 
     @Override
-    public List<List<String>> getSale (CloseableHttpClient client,  List<String> title) throws IOException {
+    public List<List<String>> getSale (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
         Map<String, String> params = new HashMap<String, String>();
         String startDate = DateUtil.getBeforeDayAgainstToday(60, "yyyy-MM-dd");
         String endDate = DateUtil.getBeforeDayAgainstToday(1, "yyyy-MM-dd");
@@ -89,7 +91,7 @@ public class Demo3 extends Abstraction {
     }
 
     @Override
-    public List<List<String>> getStock (CloseableHttpClient client,  List<String> title) throws IOException {
+    public List<List<String>> getStock (CloseableHttpClient client, String orgName, List<String> title) throws IOException {
         String startDate = DateUtil.getBeforeDayAgainstToday(60, "yyyy-MM-dd");
         String endDate = DateUtil.getBeforeDayAgainstToday(1, "yyyy-MM-dd");
         Map<String, String> params = new HashMap<> ();
@@ -132,10 +134,6 @@ public class Demo3 extends Abstraction {
     public static void main (String[] args) throws Exception {
         CloseableHttpClient client = WebUtil.getHttpClient ();
         Map<String, String> stringStringMap = new HashMap<> ();
-        Customer customer = new Customer ();
-        customer.setOrgcode ("W169027");
-        customer.setOrgname ("聚善堂（福建）医药集团有限公司");
-        customer.setFilesName (Arrays.asList ("a","b","c"));
-        new Demo3 ().exec (client,stringStringMap,customer);
+        new Demo3 ().exec (client,stringStringMap,"W169027","聚善堂（福建）医药集团有限公司");
     }
 }

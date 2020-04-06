@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -9,237 +10,110 @@
 
     <title>验证码</title>
     <!-- Bootstrap core CSS -->
-    <link href="../../static/asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}"
-          rel="stylesheet">
+    <link href="asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="../../static/asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
+    <link href="asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
     <style type="text/css">
-        .black_overlay {
-            display: none;
-            position: absolute;
-            top: 0%;
-            left: 0%;
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            z-index: 1001;
-            -moz-opacity: 0.8;
-            opacity: .80;
-            filter: alpha(opacity=88);
+        /* Chart.js */
+
+        @-webkit-keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
         }
 
-        .white_content {
-            display: none;
-            position: absolute;
-            top: 3%;
-            left: 15%;
-            width: 70%;
-            height: 95%;
-            border: 10px solid black;
-            background-color: white;
-            z-index: 1002;
-            overflow: auto;
+        @keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        .chartjs-render-monitor {
+            -webkit-animation: chartjs-render-animation 0.001s;
+            animation: chartjs-render-animation 0.001s;
         }
     </style>
 </head>
 
 <body>
-<div id="light" class="white_content">
-    <!-- 显示区 -->
-    <div id="loggingText" contenteditable="true"
-         style="width:100%;height: 90%;background-color: ghostwhite; overflow: auto;"
-         onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"></div>
-
-    <!-- 操作栏 -->
-    <div style="text-align: center;">
-        <button onclick="$('#loggingText').text('')" style="color: green; height: 35px;">清屏</button>
-        <button onclick="$('#loggingText').animate({scrollTop:$('#loggingText')[0].scrollHeight});"
-                style="color: green; height: 35px;">滚动至底部
-        </button>
-        <button onclick="if(window.loggingAutoBottom){$(this).text('开启自动滚动');}else{$(this).text('关闭自动滚动');};window.loggingAutoBottom = !window.loggingAutoBottom"
-                style="color: green; height: 35px; ">开启自动滚动
-        </button>
-    </div>
-    <a href="javascript:void(0)"
-       onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">点这里关闭本窗口</a>
-</div>
-<div id="fade" class="black_overlay"></div>
 <div class="container-fluid">
     <div class="row">
-        <nav class="navbar navbar-default navbar-fixed-top">
-            <div class="container">
-                <div class="btn-group">
-                    <a class="btn btn-success" th:href="@{/customers}" th:text=" ${type}=='Y'?'无验证码':'验证码'">跳转</a>
-                    <button href="javascript:void(0)" th:href="@{/log}" class="btn btn-info"
-                            onclick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">
-                        日志
-                    </button>
-                    <button class="btn btn-primary"th:onclick="refresh()">查看文件状态</button>
-                    <button class="btn btn-warning" th:onclick="handled()">待处理</button>
-                    <button class="btn  btn-danger"  onclick="restart()">Restart</button>
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+            <h2><a class="btn btn-sm btn-success" th:href="@{/customers}" th:text=" ${type}=='Y'?'无验证码':'验证码'">跳转</a>
+                <input class="btn btn-sm btn-danger" style="margin-left: 50px" type="button" value="Restart" onclick="restart()">
+            </h2>
+
+            <div class="table-responsive">
+                <table id="sampleTableA" class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>经销商代码</th>
+                        <th>经销商名称</th>
+                        <th>账号密码</th>
+                        <th>网址</th>
+                        <th>合并</th>
+                        <th>验证码</th>
+                        <th>验证码</th>
+                        <th>加入任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="customer:${customers}">
+                        <td th:text="${customerStat.index}+1"></td>
+                        <td th:text="${customer.orgcode}"></td>
+                        <td>[[${customer.orgname}]]</td>
+                        <td th:text="${customer.params}"></td>
+                        <td><a th:href="${customer.website}" target="_blank">[[${customer.website}]]</a></td>
+                        <td><input type="checkbox" name="merge" id="merge" th:id="${customer.orgcode}+'merge'"></td>
+                        <td><img th:id="img-+${customer.orgcode}" src="asserts/img/refresh.jpg"
+                                 th:src="@{/asserts/img/refresh.jpg}"
+                                 th:onclick="getVerifyCode([[${customer.orgcode}]]);"></td>
+                        <td><input type="text" th:id="val-+${customer.orgcode}" th:name="val-+${customer.orgcode}"
+                                   value=""></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary addBtn"
+                               th:onclick="addVerifyCode([[${customer.orgcode}]]);">加入</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style=" position: fixed; _position: absolute;top: 10px; right: 1px; _bottom: auto;
+                    padding: 1px;z-index: 9999999; width:100px; height:30px;" class="p-t_10">
+                    <input class="btn btn-sm btn-primary" type="button" value="执行任务" th:onclick="doVerifyCode()"/>
                 </div>
             </div>
-            <div style=" position: fixed; _position: absolute;left: 50%;top:10px;
-                    z-index: 1; " class="btn btn-sm btn-primary" onclick="show()">当前任务列表
-                <ol id="list" style="padding:10px;display:none">
-                    <li>a</li>
-                    <li>b</li>
-                </ol>
-            </div>
-        </nav>
-        <div th:fragment="table" id="sampleTableB" class="table-responsive">
-            <table id="sampleTableA" class="table table-striped table-responsive-sm">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>经销商代码</th>
-                    <th>经销商名称</th>
-                    <th>账号密码</th>
-                    <th>网址</th>
-                    <th>合并</th>
-                    <th>验证码</th>
-                    <th>验证码</th>
-                    <th>文件状态</th>
-                    <th>进度条</th>
-                    <th>加入任务</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="customer:${customers}">
-                    <td th:text="${customerStat.index}+1"></td>
-                    <td th:text="${customer.orgcode}"></td>
-                    <td>[[${customer.orgname}]]</td>
-                    <td th:text="${customer.params}"></td>
-                    <td><a th:href="${customer.website}" target="_blank">[[${customer.website}]]</a></td>
-                    <td><input type="checkbox" name="merge" id="merge" th:id="${customer.orgcode}+'merge'"></td>
-                    <td><img th:id="img-+${customer.orgcode}" src="../../static/asserts/img/refresh.jpg"
-                             th:src="@{/asserts/img/refresh.jpg}"
-                             th:onclick="getVerifyCode([[${customer.orgcode}]]);"></td>
-                    <td><input type="text" th:id="val-+${customer.orgcode}" th:name="val-+${customer.orgcode}"
-                               value=""></td>
-
-                    <td th:class="exist" th:text="${customer.exist}"></td>
-
-                    <td style="padding-top: 10px">
-                        <div class="progress">
-                            <div th:id="${customer.orgcode}" class="progress-bar" role="progressbar"
-                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0;">
-                            </div>
-                        </div>
-                    </td>
-
-                    <td>
-                        <a class="btn btn-sm btn-primary addBtn"
-                           th:onclick="addVerifyCode([[${customer.orgcode}]]);">加入</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div style=" position: fixed; _position: absolute;top: 10px; right: 1px; _bottom: auto;
-                    padding: 1px;z-index: 9999999;" class="p-t_10">
-                <input class="btn btn-sm btn-primary" type="button" value="执行任务" th:onclick="startListen()"/>
-            </div>
-        </div>
+        </main>
     </div>
 </div>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script type="text/javascript" src="../../static/asserts/js/jquery.min.js"
+<script type="text/javascript" src="asserts/js/jquery-3.2.1.slim.min.js"
         th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
 <script src="../../static/asserts/js/fancyTable.js" th:src="@{/asserts/js/fancyTable.js}"></script>
 <script type="text/javascript" th:inline="javascript">
     $(document).ready(function () {
-        table();
-        list();
-    });
-
-    function table() {
         $("#sampleTableA").fancyTable({
             sortColumn: 0,
             pagination: true,
-            perPage: 10,
+            perPage: 2,
             globalSearch: true
         });
-    }
+    });
 
-    //刷新待处理文件
-    function handled() {
-        hide(refresh())
-    }
-
-    function refresh() {
-        $.ajax({
-            url: "verifyCustomers/refresh",
-            type: "GET",
-            cache: false,
-            async: false,
-            success: function (result) {
-                $("#sampleTableB").html(result)
-                table();
-            },
-            error: function () {
-                alert('服务器发生错误');
-            }
-
-        });
-    }
-
-    function hide(refresh) {
-        var list = $(".exist");
-        for (var i = 0; i < list.length; i++) {
-            var textContent = list[i].textContent;
-            textContent = textContent.substring(textContent.indexOf("[") + 1, textContent.indexOf("]"));
-            var strings = textContent.split(',');
-            console.log(strings[0]);
-            if (JSON.parse(strings[0]) && JSON.parse(strings[1])) {
-                list[i].parentElement.style.display = "none";
-            }
-        }
-    }
-
-    //当前任务列表
-    var flag = true;
-    function show() {
-        if (flag) {
-            $('#list').css('display', 'block');
-            flag = false;
-        } else {
-            $('#list').css('display', 'none');
-            flag = true;
-        }
-    }
-
-    //查看文件状态
-    function list() {
-        $.ajax({
-            url: "verifyCustomers/list",
-            type: "GET",
-            cache: false,
-            async: false,
-            success: function (result) {
-                if (result['data'] != null) {
-                    var list = result['data'];
-                    var str = "";
-                    for (var i = 0; i < list.length; i++) {
-                        str += "<li >" + list[i]['orgcode'] + "</li>";
-                    }
-                    $('#list').html(str)
-                }
-            },
-            error: function () {
-                alert('服务器发生错误');
-            }
-
-        });
-    }
-
-    //加入任务列表
     function addVerifyCode(orgCode) {
         var verifyCode = $('#val-' + orgCode).val();
         var merge = $('#' + orgCode + "merge").prop("checked");
+        console.log(merge)
         $.ajax({
             url: "verifyCustomers/add/" + orgCode,
             type: "POST",
@@ -247,12 +121,6 @@
             cache: false,
             success: function (result) {
                 if (result['code'] == 200) {
-                    var list = result['data'];
-                    var str = "";
-                    for (var i = 0; i < list.length; i++) {
-                        str += "<li>" + list[i].replace("-false","") + "</li>";
-                    }
-                    $('#list').html(str);
                     alert('加入任务成功');
                 } else if (result['code'] == 500) {
                     alert(result['message']);
@@ -270,9 +138,8 @@
         });
     }
 
-
-    //执行任务
     function doVerifyCode() {
+        alert('开始执行任务');
         $.ajax({
             url: "verifyCustomers/do",
             type: "POST",
@@ -285,7 +152,6 @@
                 } else {
                     alert("正在执行其他任务")
                 }
-                list()
             },
             error: function (html) {
                 alert('服务器发生错误');
@@ -294,7 +160,6 @@
         });
     }
 
-    //获取验证码
     function getVerifyCode(orgCode) {
         $.ajax({
             url: "verifyCustomers/get/" + orgCode,
@@ -314,11 +179,9 @@
         });
     }
 
-
-    //重启服务
     function restart() {
         var c = confirm("你确定重启？？？")
-        if (c) {
+        if (c == true) {
             $.ajax({
                     url: '/restart',
                     success: function () {
@@ -330,89 +193,9 @@
             alert("下次别乱点！！")
         }
     }
-
-
-    //监听任务进度
-    function startListen() {
-        socket(doVerifyCode())
-    }
-
-    function socket(add){
-        //websocket对象
-        let websocket = null;
-
-        //判断当前浏览器是否支持WebSocket
-        if ('WebSocket' in window) {
-            websocket = new WebSocket("ws://localhost:18080/websocket/1");
-        } else {
-            console.error("不支持WebSocket");
-        }
-
-        //连接发生错误的回调方法
-        websocket.onerror = function (e) {
-            console.error("WebSocket连接发生错误");
-        };
-
-        //连接成功建立的回调方法
-        websocket.onopen = function () {
-            console.log("WebSocket连接成功")
-        };
-
-        //接收到消息的回调方法
-        websocket.onmessage = function (event) {
-            var count = 0;
-            var list = JSON.parse(event.data);
-            var load = list.doStatus;
-            for (var key in load) {
-                var element = $('#' + key);
-                var sum = load[key][0] + load[key][1] + load[key][2];
-                switch (sum) {
-                    case 1:
-                        element.css("width", "30%");
-                        element.text("30%");
-                        break;
-                    case 2:
-                        element.css("width", "60%");
-                        element.text("60%");
-                        break;
-                    case 3:
-                        element.css("width", "100%");
-                        element.text("100%");
-                        count++;
-                        break;
-                }
-
-            }
-
-            var message = list.log;
-            //追加
-            if (message!=null) {
-                //日志内容
-                let $loggingText = $("#loggingText");
-                $loggingText.append(message);
-
-                //是否开启自动底部
-                if (window.loggingAutoBottom) {
-                    //滚动条自动到最底部
-                    $loggingText.scrollTop($loggingText[0].scrollHeight);
-                }
-            }
-
-            if (count == Object.keys(load).length) {
-                websocket.close();
-            }
-
-        }
-
-        //连接关闭的回调方法
-        websocket.onclose = function () {
-            console.log("WebSocket连接关闭")
-        };
-    }
-
 </script>
-<script type="text/javascript" src="../../static/asserts/js/popper.min.js" th:src="@{/asserts/js/popper.min.js}"></script>
-<script type="text/javascript" src="../../static/asserts/js/bootstrap.min.js" th:src="@{/asserts/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="asserts/js/popper.min.js" th:src="@{/asserts/js/popper.min.js}"></script>
+<script type="text/javascript" src="asserts/js/bootstrap.min.js" th:src="@{/asserts/js/bootstrap.min.js}"></script>
 </body>
 
 </html>

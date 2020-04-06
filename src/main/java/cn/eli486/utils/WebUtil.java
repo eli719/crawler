@@ -16,7 +16,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -41,7 +40,6 @@ import java.util.Map;
 public class WebUtil {
     private static CloseableHttpClient httpsClient;
     private static CloseableHttpClient httpClient;
-    public static Header[] headers;
 
     static {
 //        httpClient = getHttpClient();
@@ -210,6 +208,33 @@ public class WebUtil {
         }
     }
 
+
+    public static String httpPost (CloseableHttpClient client, Map<String, String> params, String httpUrl) {
+        String result;
+        HttpPost httpPost = null;
+        try {
+            if (MapUtils.isEmpty (params)) {
+                throw new Exception ("请求参数不能为空");
+            }
+            httpPost = new HttpPost (httpUrl);
+            ArrayList<NameValuePair> nvps = new ArrayList<> ();
+            for (Map.Entry<String, String> entry : params.entrySet ()) {
+                nvps.add (new BasicNameValuePair (entry.getKey (), entry.getValue ()));
+            }
+            httpPost.setEntity (new UrlEncodedFormEntity (nvps, StandardCharsets.UTF_8));
+            System.out.println ("Executing request: " + httpPost.getRequestLine ());
+            CloseableHttpResponse response = client.execute (httpPost);
+            result = EntityUtils.toString (response.getEntity ());
+            EntityUtils.consume (response.getEntity ());
+        } catch (Exception e) {
+            throw new RuntimeException (e);
+        } finally {
+            assert httpPost != null;
+            httpPost.releaseConnection ();
+        }
+        return result;
+    }
+
     public static String httpGet (CloseableHttpClient client, String url) throws IOException {
         String result = "";
         HttpGet request = new HttpGet (url);
@@ -228,6 +253,7 @@ public class WebUtil {
         } catch (Exception e) {
             e.printStackTrace ();
         } finally {
+
             EntityUtils.consume (entity);
             request.releaseConnection ();
         }
@@ -235,152 +261,35 @@ public class WebUtil {
         return result;
     }
 
-
-    public static String httpGet (CloseableHttpClient client, String url,String headerName,String headerValue) throws IOException {
-        String result = "";
-        HttpGet request = new HttpGet (url);
-        HttpEntity entity = null;
-        request.setHeader (headerName,headerValue);
-        try (CloseableHttpResponse response = client.execute (request)) {
-            if (HttpStatus.SC_INTERNAL_SERVER_ERROR == response.getStatusLine ().getStatusCode ()) {
-                throw new Exception ("服务器发生内部错误");
-            }
-            if (HttpStatus.SC_OK != response.getStatusLine ().getStatusCode ()) {
-                return "";
-            }
-            entity = response.getEntity ();
-            if (entity != null) {
-                result = EntityUtils.toString (entity, StandardCharsets.UTF_8);
-            }
-        } catch (Exception e) {
-            e.printStackTrace ();
-        } finally {
-            EntityUtils.consume (entity);
-            request.releaseConnection ();
-        }
-
-        return result;
-    }
-
-    public static void getFile (CloseableHttpClient client, String url,
-                                String fileName) {
+    /**
+     * 获取传输文件
+     * @param client
+     * @param url
+     * @param fileName
+     */
+    public static void requestFile (CloseableHttpClient client, String url,
+                                    String fileName) {
         HttpGet get = new HttpGet (url);
         try {
-            CloseableHttpResponse response = client.execute (get);
-            downFile (response,fileName);
-        } catch (Exception e) {
-            e.printStackTrace ();
-        } finally {
-            get.releaseConnection ();
-        }
-    }
+            HttpResponse response = client.execute (get);
 
-    public static String httpPost (CloseableHttpClient client, Map<String, String> params, String httpUrl) {
-        String result;
-        HttpPost httpPost = null;
-        try {
-            if (MapUtils.isEmpty (params)) {
-                throw new Exception ("请求参数不能为空");
+            if (HttpStatus.SC_OK != response.getStatusLine ().getStatusCode ()) {
+                return;
             }
-            httpPost = new HttpPost (httpUrl);
-            ArrayList<NameValuePair> nvps = parsePostParams (params);
-            httpPost.setEntity (new UrlEncodedFormEntity (nvps, StandardCharsets.UTF_8));
-            CloseableHttpResponse response = client.execute (httpPost);
-            headers = response.getHeaders ("set-Cookie");
-            result = EntityUtils.toString (response.getEntity (), "utf-8");
-            EntityUtils.consume (response.getEntity ());
-        } catch (Exception e) {
-            throw new RuntimeException (e);
-        } finally {
-            assert httpPost != null;
-            httpPost.releaseConnection ();
-        }
-        return result;
-    }
 
-    public static String httpPostJson (CloseableHttpClient client, String jsonParam, String httpUrl,String headerName,String headerValue) {
-        String result;
-        StringEntity entity;
-        HttpPost httpPost = null;
-        try {
-            httpPost = new HttpPost (httpUrl);
-            entity = new StringEntity (jsonParam, "UTF-8");
-            entity.setContentType ("text/json");
-            httpPost.setHeader ("accept", "application/json, text/plain, */*");
-            httpPost.setHeader ("Content-Type", "application/json");
-            httpPost.setHeader (headerName,headerValue);
-            httpPost.setEntity (entity);
-            CloseableHttpResponse response = client.execute (httpPost);
-            result = EntityUtils.toString (response.getEntity (), "utf-8");
-            EntityUtils.consume (response.getEntity ());
-        } catch (Exception e) {
-            throw new RuntimeException (e);
-        } finally {
-            assert httpPost != null;
-            httpPost.releaseConnection ();
-        }
-        return result;
-    }
+            HttpEntity entity = response.getEntity ();
+            if (entity == null) {
+                return;
+            }
 
-    public static String httpPostJson (CloseableHttpClient client, String jsonParam, String httpUrl) {
-        String result;
-        StringEntity entity;
-        HttpPost httpPost = null;
-        try {
-            httpPost = new HttpPost (httpUrl);
-            entity = new StringEntity (jsonParam, "UTF-8");
-            entity.setContentType ("text/json");
-            httpPost.setHeader ("accept", "application/json, text/javascript, */*");
-            httpPost.setHeader ("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            httpPost.setEntity (entity);
-            CloseableHttpResponse response = client.execute (httpPost);
-            result = EntityUtils.toString (response.getEntity (), "utf-8");
-            EntityUtils.consume (response.getEntity ());
-        } catch (Exception e) {
-            throw new RuntimeException (e);
-        } finally {
-            assert httpPost != null;
-            httpPost.releaseConnection ();
-        }
-        return result;
-    }
-
-    public static void postFile (CloseableHttpClient client, String url, Map<String, String> params,
-                                 String fileName) {
-        HttpPost post = new HttpPost (url);
-        try {
-            ArrayList<NameValuePair> nvps = parsePostParams (params);
-            post.setEntity (new UrlEncodedFormEntity (nvps, StandardCharsets.UTF_8));
-            CloseableHttpResponse response = client.execute (post);
-            downFile (response,fileName);
+            File storeFile = new File (fileName);
+            FileOutputStream output = new FileOutputStream (storeFile);
+            entity.writeTo (output);
+            output.close ();
         } catch (Exception e) {
             e.printStackTrace ();
         } finally {
-            post.releaseConnection ();
+            get.abort ();
         }
-    }
-
-
-
-    private static ArrayList<NameValuePair> parsePostParams(Map<String, String> params){
-        ArrayList<NameValuePair> nvps = new ArrayList<> ();
-        for (Map.Entry<String, String> entry : params.entrySet ()) {
-            nvps.add (new BasicNameValuePair (entry.getKey (), entry.getValue ()));
-        }
-        return nvps;
-    }
-    private static void downFile(CloseableHttpResponse response,String fileName)throws Exception{
-        if (HttpStatus.SC_OK != response.getStatusLine ().getStatusCode ()) {
-            return;
-        }
-        HttpEntity entity = response.getEntity ();
-        if (entity == null) {
-            return;
-        }
-        File storeFile = new File (fileName);
-        FileOutputStream output = new FileOutputStream (storeFile);
-        entity.writeTo (output);
-        output.close ();
-        EntityUtils.consume (entity);
     }
 }

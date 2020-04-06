@@ -69,6 +69,9 @@ public class ScheduledConfig {
         }
     }
 
+
+
+
     public void startNow (List<DailyTask> crons,String className) {
         try {
             for (DailyTask cron : crons) {
@@ -78,7 +81,6 @@ public class ScheduledConfig {
                         scheduledFuture.cancel (true);
                         ScheduledFuture<?> future = threadPoolTaskScheduler.schedule ((Runnable) cron, new Date ());
                     }
-
                 }
             }
 ////            scheduleMap.clear();
