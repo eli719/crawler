@@ -18,7 +18,20 @@ import java.util.List;
 public class TitleConfig {
 
     public static List<List<String> > getTitle(){
-        ClassPathResource resource = new ClassPathResource ("title.json");
+        JSONArray customers = parseJsonFile ("title.json", "titles");
+        List<List<String>> lists=new ArrayList<> ();
+        Iterator<Object> iterator = customers.iterator ();
+        while (iterator.hasNext ()){
+            Object next = iterator.next ();
+            lists.add ((List<String>) next);
+        }
+        return lists;
+
+    }
+
+
+    public static JSONArray parseJsonFile (String fileName, String arrayName){
+        ClassPathResource resource = new ClassPathResource (fileName);
         StringBuilder builder = new StringBuilder ();
         BufferedReader bufferedReader = null;
         String s = null;
@@ -40,17 +53,8 @@ public class TitleConfig {
             }
         }
         JSONObject parse = JSON.parseObject (builder.toString ());
-        JSONArray customers = parse.getJSONArray ("titles");
-        List<List<String>> lists=new ArrayList<> ();
-        Iterator<Object> iterator = customers.iterator ();
-        while (iterator.hasNext ()){
-            Object next = iterator.next ();
-            lists.add ((List<String>) next);
-        }
-        return lists;
-
+        return  parse.getJSONArray (arrayName);
     }
-
 
     public static void main (String[] args) {
         List<List<String>> title = getTitle ();

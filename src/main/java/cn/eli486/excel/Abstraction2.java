@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static cn.eli486.utils.FileUtil.getSumInfo;
 import static cn.eli486.utils.FileUtil.hasCreateDir;
@@ -25,9 +26,10 @@ import static cn.eli486.utils.FileUtil.hasCreateDir;
  * @author eli
  * Excel模板类
  */
-public abstract class Abstraction implements Stock, Sale, Purchase {
+@Deprecated
+public abstract class Abstraction2 implements Stock, Sale, Purchase {
     protected boolean merge = false;
-    protected Logger logger = LoggerFactory.getLogger (Abstraction.class);
+    protected Logger logger = LoggerFactory.getLogger (Abstraction2.class);
 
     public boolean isMerge () {
         return merge;
@@ -65,7 +67,48 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
 
         try {
             Map<String, List<Integer>> doStatus = CustomerController.pageMessage.getDoStatus ();
-            execTasks (doStatus,client,customer);
+            if (doStatus==null){
+                doStatus = new HashMap<> ();
+            }
+            Map<String, List<Integer>> finalDoStatus = doStatus;
+            //多线程异步执行任务，变快了但这样进度条的功能就不用
+            CompletableFuture<Void> stockFuture = CompletableFuture.runAsync (() ->{
+                System.out.println (Thread.currentThread ().getName ());
+                stock (client, customer);});
+            stockFuture.whenComplete ((aVoid, throwable) -> {
+                finalDoStatus.get (customer.getOrgcode ()).set (0,1);
+                System.out.println (finalDoStatus.values ());
+
+
+            });
+            CompletableFuture<Void> saleFuture = CompletableFuture.runAsync (() -> {
+                System.out.println (Thread.currentThread ().getName ());
+                sale (client, customer);
+            });
+            saleFuture.whenComplete ((aVoid, throwable) -> {
+                finalDoStatus.get (customer.getOrgcode ()).set (1,1);
+                System.out.println (finalDoStatus.values ());
+
+            });
+            CompletableFuture<Void> purchaseFuture = CompletableFuture.runAsync (() ->{
+                    System.out.println (Thread.currentThread ().getName ());
+                    purchase (client, customer);});
+
+            purchaseFuture.whenComplete ((aVoid, throwable) -> {
+                finalDoStatus.get (customer.getOrgcode ()).set (2,1);
+                System.out.println (finalDoStatus.values ());
+
+
+            });
+            CompletableFuture<Void> allFutures = CompletableFuture.allOf (stockFuture, saleFuture, purchaseFuture);
+            System.out.println (allFutures.get ());
+            System.out.println (finalDoStatus.values ());
+//            stock (client, customer);
+//            doStatus.replace (customer.getOrgcode (), Arrays.asList (1, 0, 0));
+//            sale (client, customer);
+//            doStatus.replace (customer.getOrgcode (), Arrays.asList (1, 1, 0));
+//            purchase (client, customer);
+//            doStatus.replace (customer.getOrgcode (), Arrays.asList (1, 1, 1));
         } catch (Exception e) {
             e.printStackTrace ();
         }
@@ -90,7 +133,7 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
                         + customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
                 bakFile = GlobalInfo.BAK_DIR + "/V" + customer.getOrgcode ().split ("-")[0]
                         + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
-                fileName = "/V" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+                fileName = "/V" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + customer.getOrgname () + ".xls";
             } else {
                 fileName = customer.getFilesName ().get (0) + ".xls";
                 fileName = FileUtil.parseFileName (fileName, customer);
@@ -146,7 +189,7 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
                             }
                             List<List<String>> sumStockInfo = getSumInfo (childDir, "V");
                             FileUtil.createExcel (sumStockInfo, stockFile.trim (), null);
-                            logger.info ("生成库存合并文件 " + stockFile);
+                            logger.info ("生成库存合并文件 " + sumStockInfo);
                         }
                     }
                 }
@@ -172,7 +215,7 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
                         + customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
                 bakFile = GlobalInfo.BAK_DIR + "/S" + customer.getOrgcode ().split ("-")[0]
                         + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
-                fileName = "/S" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+                fileName = "/S" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + customer.getOrgname () + ".xls";
             } else {
                 fileName = customer.getFilesName ().get (1) + ".xls";
                 fileName = FileUtil.parseFileName (fileName, customer);
@@ -250,7 +293,7 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
                         + customer.getOrgcode ().split ("-")[0] + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
                 bakFile = GlobalInfo.BAK_DIR + "/P" + customer.getOrgcode ().split ("-")[0]
                         + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
-                fileName = "/P" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyyMMdd") + "_" + customer.getOrgname () + ".xls";
+                fileName = "/P" + customer.getOrgcode () + "_" + DateUtil.getBeforeDayAgainstToday (1, "yyyy-MM-dd") + "_" + customer.getOrgname () + ".xls";
             } else {
                 fileName = customer.getFilesName ().get (2) + ".xls";
                 fileName = FileUtil.parseFileName (fileName, customer);
@@ -342,19 +385,6 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
         }
         content.add (rows);
         return content;
-    }
-
-
-    protected void execTasks( Map<String, List<Integer>> doStatus,CloseableHttpClient client,Customer customer){
-        if (doStatus==null){
-            doStatus = new HashMap<> (3);
-        }
-        stock (client, customer);
-        doStatus.get (customer.getOrgcode ()).set (0,1);
-        sale (client, customer);
-        doStatus.get (customer.getOrgcode ()).set (1,1);
-        purchase (client, customer);
-        doStatus.get (customer.getOrgcode ()).set (2,1);
     }
 
 }

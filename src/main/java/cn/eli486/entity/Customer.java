@@ -2,6 +2,7 @@ package cn.eli486.entity;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,7 +20,33 @@ public class Customer {
     private boolean status;
     private String type;
     private String action;
+    private List<Boolean> exist;
+    private List<String> filesName;
+    private List<Integer> doStatus;
 
+    public List<Integer> getDoStatus () {
+        return doStatus;
+    }
+
+    public void setDoStatus (List<Integer> doStatus) {
+        this.doStatus = doStatus;
+    }
+
+    public List<String> getFilesName () {
+        return filesName;
+    }
+
+    public void setFilesName (List<String> filesName) {
+        this.filesName = filesName;
+    }
+
+    public List<Boolean> getExist () {
+        return exist;
+    }
+
+    public void setExist (List<Boolean> exist) {
+        this.exist = exist;
+    }
     public String getOrgcode () {
         return orgcode;
     }
@@ -104,6 +131,9 @@ public class Customer {
                 ", status=" + status +
                 ", type='" + type + '\'' +
                 ", action='" + action + '\'' +
+                ", exist=" + exist +
+                ", filesName=" + filesName +
+                ", doStatus=" + doStatus +
                 '}';
     }
 }
