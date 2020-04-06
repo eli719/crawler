@@ -1,11 +1,9 @@
 # SimpleCrawlerDemo-Update
 With HttpClient 4.5.10 and POI,Crawl data from websites after login and download data you select into Excel.
 
+![效果图](https://github.com/eli719/crawler/blob/master/example.png)
 ![效果图](https://github.com/eli719/crawler/blob/master/video.gif)
-<<<<<<< HEAD
 
-=======
->>>>>>> 7019990aed3d5289d144accb0086b5cb19b8d819
 ## Knowledge points:
   - HttpClient
   - POI and JXL
