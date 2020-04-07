@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * @author el
+ */
 @Slf4j
 @Configuration
 public class Config {
