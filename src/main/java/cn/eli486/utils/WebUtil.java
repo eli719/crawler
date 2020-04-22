@@ -1,5 +1,6 @@
 package cn.eli486.utils;
 
+import cn.eli486.ocr.WebImage;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -23,11 +24,9 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import javax.imageio.ImageIO;
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
+import java.io.*;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
@@ -382,5 +381,65 @@ public class WebUtil {
         entity.writeTo (output);
         output.close ();
         EntityUtils.consume (entity);
+    }
+
+
+    /**
+     *    获取网络图片二进制数组
+     *    默认转成jpg类型
+     * @param client 客户端
+     * @param url 图片链接
+     * @return 二进制数组
+     * @throws IOException
+     */
+
+    public static byte[] getPicByte(CloseableHttpClient client, String url) throws IOException {
+        HttpGet get = new HttpGet(url);
+        HttpEntity entity = null;
+        byte[] imgData=null;
+        try {
+            HttpResponse response = client.execute(get);
+
+            if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
+                return null;
+            }
+            entity = response.getEntity();
+            ByteArrayOutputStream o = new ByteArrayOutputStream ();
+            ImageIO.write(ImageIO.read(entity.getContent()), "jpg", o);
+            imgData= o.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            get.abort();
+        }
+
+        return imgData;
+
+    }
+    /**
+     * 获取验证码值,默认识别最多3次
+     * @param client 客户端
+     * @param picUrl 验证码图片链接
+     * @param length 验证码识别长度
+     * @return 验证码
+     * @throws Exception
+     */
+    public static String getVerifyCode(CloseableHttpClient client, String picUrl, int length) throws Exception {
+        for (int i = 0; i < 3; i++) {
+            byte[] imgData = WebUtil.getPicByte(client, picUrl);
+            String verifyCode = WebImage.webImage2(client, imgData);
+            verifyCode = StringUtil.getValue(verifyCode, "words\": \"", "\"}", 1);
+            if (verifyCode.length() == length) {
+                return verifyCode;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 获取验证码值，默认4位的验证码
+     */
+    public static String getVerifyCode(CloseableHttpClient client, String picUrl) throws Exception {
+        return getVerifyCode(client,picUrl,4);
     }
 }

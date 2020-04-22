@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -348,6 +349,7 @@ public abstract class Abstraction implements Stock, Sale, Purchase {
     protected void execTasks( Map<String, List<Integer>> doStatus,CloseableHttpClient client,Customer customer){
         if (doStatus==null){
             doStatus = new HashMap<> (3);
+            doStatus.put (customer.getOrgcode (), Arrays.asList (0,0,0));
         }
         stock (client, customer);
         doStatus.get (customer.getOrgcode ()).set (0,1);

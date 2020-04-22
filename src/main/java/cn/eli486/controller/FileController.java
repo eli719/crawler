@@ -84,8 +84,7 @@ public class FileController {
                     i = bufferedInputStream.read (buffer);
                 }
                 outputStream.flush ();
-            } catch (IOExcep
-                    tion e) {
+            } catch (IOException e) {
                 e.printStackTrace ();
             }
         }

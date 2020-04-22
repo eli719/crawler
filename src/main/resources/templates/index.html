@@ -7,14 +7,14 @@
     <meta name="author" content="">
     <title>Crawler</title>
     <!-- Bootstrap core CSS -->
-    <link href="asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}" rel="stylesheet">
+    <link type="text/css"  rel="stylesheet" href="asserts/css/bootstrap.min.css" th:href="@{/asserts/css/bootstrap.min.css}"  >
     <!-- Custom styles for this template -->
-    <link href="asserts/css/signin.css" th:href="@{/asserts/css/signin.css}" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="asserts/css/signin.css" th:href="@{/asserts/css/signin.css}" >
 </head>
 
 <body class="text-center">
 <form id="form" class="form-signin" action="#" th:action="@{/login}" method="post">
-    <img class="mb-4" src="asserts/img/bootstrap-solid.svg" th:src="@{/asserts/img/bootstrap-solid.svg}" alt=""
+    <img class="mb-4" src="/static/asserts/img/bootstrap-solid.svg" th:src="@{/asserts/img/bootstrap-solid.svg}" alt=""
          width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <label class="sr-only">Username</label>
