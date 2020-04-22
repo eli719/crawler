@@ -15,7 +15,7 @@ With HttpClient 4.5.10 and POI,Crawl data from websites after login and download
   - SpringBoot task: @Schedled
  - Thymealf in simple use
 
-## Added Functions:
+## Add Functions:
 
 - Watch log from page:
   -  read log file with websocket
@@ -24,3 +24,9 @@ With HttpClient 4.5.10 and POI,Crawl data from websites after login and download
 - add button to download files completed
 - CompletableFuture can be used to speed up tasks
 
+
+
+## ADD BaiDuAI OCR
+
+- Util package :cn.eli486.ocr
+- Example :cn.eli486.imp.CodeW703846Abstraction
